@@ -1,0 +1,218 @@
+/*题目：小学四则运算出题工具*/
+/*需求分析：C语言（循环，随机数，字符数组，文件）*/
+/*设计：
+        1.题目避免重复
+        2.可拓展性
+        3.可定制（数量、打印方式）
+        4.具体定制：是否有括号，数值范围，加减有无负数，除法有无余数，是否支持分数，打印中每行的间隔可调整？？？
+        5.答案输出*/
+/*待优化项：
+        1.多列打印对齐
+        2.引入分数
+        3.输出至文件
+        4.题目避免重复*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <windows.h>
+int main()
+{
+    int num;  /*题目数量*/
+    int min;  /*最小值*/
+    int max;  /*最大值*/
+    int pri;  /*打印设置（1-单排，2-双排）*/
+    int ans;  /*答案设置（1-打印，2-不打印）*/
+    int _set; /*具体设置（1-进入，2-跳过）*/
+    int brac = 2;  /*括号设置（默认无括号）*/
+    int neg  = 1;  /*负数设置（默认加减有负数）*/
+    int rem  = 1;  /*余数设置（默认除法有余数）*/
+    int fra  = 2;  /*分数设置（默认不支持分数）。。。。。。。当前不支持，没有为什么，bulabula*/
+
+    int  i;            /*循环变量*/
+    int  a,b,c;        /*随机数（c是待定分数分母，此时b为分子）*/
+    int  sym_num = 0;  /*随机符号对应数*/
+    char symbol;       /*随机符号*/
+    int  *p,*q;        /*答案动态指针，q记录除法余数*/
+
+/*************************************************分隔符*****************************************************/
+
+    menu:                                     /*目录：初始界面*/
+        system("cls");                        /*清屏*/
+        printf("【小学四则运算出题工具】\n");
+        printf("1.题目数量：");
+        scanf("%d",&num);
+        while(num <= 0)
+        {
+            printf("题目数量输入错误，请重新输入：");
+            scanf("%d",&num);
+        }
+        printf("2.数值范围（默认整数）\n最小值：");
+        scanf("%d",&min);
+        printf("最大值：");
+        scanf("%d",&max);
+        while(max <= min)
+        {
+            printf("数值范围出错，请重新设置数值范围！\n");
+            printf("2.数值范围最小值：");
+            scanf("%d",&min);
+            printf("  数值范围最大值：");
+            scanf("%d",&max);
+        }
+        printf("3.打印设置\n请输入每行打印题目数目：");
+        scanf("%d",&pri);
+        while(pri <= 0)
+        {
+            printf("指令错误！请重新输入：");
+            scanf("%d",&pri);
+        }
+        printf("4.是否输出答案（1——是，2——否）：");
+        scanf("%d",&ans);
+        while(ans != 1 && ans != 2)
+        {
+            printf("指令错误！请重新输入：");
+            scanf("%d",&ans);
+        }
+        if(ans == 1)         /*为答案记录申请动态空间*/
+        {
+            p = (int*)malloc(num * sizeof(int));
+            if(NULL == p)
+            {
+                printf("动态申请空间出错！程序运行结束.\n");
+                exit(1);
+            }
+        }
+        printf("5.是否进入具体设置（1——进入，2——跳过）：");
+        scanf("%d",&_set);
+        while(_set != 1 && _set != 2)
+        {
+            printf("指令错误！请重新输入：");
+            scanf("%d",&_set);
+        }
+        if(_set == 1)
+        {
+            system("cls");
+            printf("1.是否输出括号（1——输出，2——不输出）：");
+            scanf("%d",&brac);
+            while(brac != 1 && brac != 2)
+            {
+                printf("指令错误！请重新输入：");
+                scanf("%d",&brac);
+            }
+            printf("2.加减有无负数（1——有，2——无）：");
+            scanf("%d",&neg);
+            while(neg != 1 && neg != 2)
+            {
+                printf("指令错误！请重新输入：");
+                scanf("%d",&neg);
+            }
+            printf("3.除法有无余数（1——有，2——无）：");
+            scanf("%d",&rem);
+            while(rem != 1 && rem != 2)
+            {
+                printf("指令错误！请重新输入：");
+                scanf("%d",&rem);
+            }
+            printf("4.是否支持分数（1——是，2——否）\n此功能待定，当前不支持分数：");
+            scanf("%d",&fra);
+            while(fra != 1 && fra != 2)
+            {
+                printf("指令错误！请重新输入：");
+                scanf("%d",&fra);
+            }
+        }
+        if(ans == 1 && rem == 1)    /*为余数记录申请动态空间*/
+        {
+            q = (int*)malloc(num * sizeof(int));
+            if(NULL == q)
+            {
+                printf("动态申请空间出错！程序运行结束.\n");
+                exit(1);
+            }
+            for(i = 0; i < num; i++)
+                q[i] = 0;
+        }
+        printf("正在打印，请稍后......\n");
+        Sleep(500);
+        system("cls");
+/*************************************************分隔符***********************************************************/
+
+    srand(time(NULL));
+    printf("【题目】\n");
+    for(i = 0; i < num; i++)
+    {
+        sym_num = rand() % 4 + 1;
+        if((sym_num == 1 || sym_num == 2) && neg == 2)                   /*加法负数设置——无负数的情况*/
+        {
+            a = rand() % (max - 0 + 1) + 0;
+            b = rand() % (max - 0 + 1) + 0;
+        }
+        else
+        {
+            a = rand() % (max - min + 1) + min;
+            b = rand() % (max - min + 1) + min;
+        }
+
+        while(sym_num == 4 && b == 0)                  /*检验除法的合法性*/
+        {
+            b = rand() % (max - min + 1) + min;
+        }
+        while(rem == 2 && sym_num == 4 && (a % b != 0))  /*除法余数设置——无余数的情况*/
+        {
+            a = rand() % (max - min + 1) + min;
+            b = rand() % (max - min + 1) + min;
+            while(b == 0)
+                b = rand() % (max - min + 1) + min;
+        }
+        switch(sym_num)
+        {
+            case 1: symbol = '+'; break;
+            case 2: symbol = '-'; break;
+            case 3: symbol = '*'; break;
+            case 4: symbol = '/'; break;
+        }
+        printf("%d. %d %c ", i+1, a, symbol);
+        if(brac == 1 && b < 0)                      /*括号设置——有括号*/
+            printf("(%d) ", b);
+        else
+            printf("%d ", b);
+        if((i + 1) % pri != 0)
+            printf("=           ");
+        else if((i + 1) % pri == 0)
+            printf("= \n");
+
+        if(ans == 1)
+        {
+            switch(sym_num)
+            {
+                case 1: p[i] = a + b;break;
+                case 2: p[i] = a - b;break;
+                case 3: p[i] = a * b;break;
+                case 4: p[i] = a / b;if(rem == 1)q[i] = a % b;break;
+            }
+        }
+    }
+    if(ans == 1)
+    {
+        printf("\n\n\n【答案】\n");
+        for(i = 0; i < num; i++)
+        {
+            printf("%d. %d", i+1, p[i]);
+            if(rem == 1)
+                if(q[i] != 0)
+                    printf("余%d", q[i]);
+            if((i + 1) % pri != 0)
+                printf("          ");
+            else if((i + 1) % pri == 0)
+                printf("\n");
+        }
+    }
+
+/******************************************分隔符************************************************/
+
+    if(ans == 1)
+        free(p);
+    if(ans == 1 && rem == 1)
+        free(q);
+    return 0;
+}
