@@ -6,8 +6,8 @@
   2.具体定制：是否有括号，加减有无负数，除法有无余数  
   3.可输出答案  
   
-开发环境：code:block, C language
-运行环境：windows xp，win7，win8，win10
+开发环境：code:block （C language）
+运行环境：windows xp，win7，win8，win10 
   
 下一个版本待完善内容有：  
   1.多列打印对齐  
